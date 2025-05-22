@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.RestClient;
+import yereumi.yboard.article.response.ArticlePageResponse;
 import yereumi.yboard.article.service.response.ArticleResponse;
 
 public class ArticleApiTest {
@@ -68,8 +69,21 @@ public class ArticleApiTest {
     void delete(Long articleId) {
 
         restClient.delete()
-                .uri("v1/articles/{articleId}", articleId)
+                .uri("/v1/articles/{articleId}", articleId)
                 .retrieve();
+    }
+
+    @Test
+    void readAllTest() {
+        ArticlePageResponse response = restClient.get()
+                .uri("/v1/articles?boardId=1&pageSize=30&page=50000")
+                .retrieve()
+                .body(ArticlePageResponse.class);
+
+        System.out.println("response.getArticleCount() = " + response.getArticleCount());
+        for (ArticleResponse article : response.getArticles()) {
+            System.out.println("article.getArticleId() = " + article.getArticleId());
+        }
     }
 
     @Getter
