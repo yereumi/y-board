@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import yereumi.yboard.article.entity.Article;
 import yereumi.yboard.article.repository.ArticleRepository;
+import yereumi.yboard.article.response.ArticlePageResponse;
 import yereumi.yboard.article.service.request.ArticleCreateRequest;
 import yereumi.yboard.article.service.request.ArticleUpdateRequest;
 import yereumi.yboard.article.service.response.ArticleResponse;
@@ -46,5 +47,18 @@ public class ArticleService {
     public void delete(Long articleId) {
 
         articleRepository.deleteById(articleId);
+    }
+
+    public ArticlePageResponse readAll(Long boardId, Long page, Long pageSize) {
+
+        return ArticlePageResponse.of(
+                articleRepository.findAll(boardId, (page - 1) * pageSize, pageSize).stream()
+                        .map(ArticleResponse::from)
+                        .toList(),
+                articleRepository.count(
+                        boardId,
+                        PageLimitCalculator.calculatePageLimit(page, pageSize, 10L)
+                )
+        );
     }
 }
